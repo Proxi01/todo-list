@@ -64,7 +64,6 @@ export default class App extends Component {
     }
 
     onToggleImportant = (id)=>{
-        const el = this.state.todoData.map((el)=>el.id===id);
         this.setState(({todoData})=>{
             return{
                 todoData: this.toggleProperty(todoData,id,'important')
