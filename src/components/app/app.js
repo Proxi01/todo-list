@@ -16,7 +16,8 @@ export default class App extends Component {
             this.createTodoItem('Make Awesome App'),
             this.createTodoItem('Have a lunch')
         ],
-        term:''
+        term:'',
+        filter:'all' // active, all, done
     }
 
 
@@ -95,10 +96,44 @@ export default class App extends Component {
         this.setState({term})
     }
 
+    changeButtonView = (e)=>{
+        const buttons = document.querySelectorAll('button[type="button"]');
+        console.log(buttons);
+        buttons.forEach((el)=>{
+             el.classList.remove('btn-info');
+             el.classList.add('btn-outline-secondary');
+        })
+        e.target.classList.add('btn-info');
+        e.target.classList.remove('btn-outline-secondary');
+    }
+
+    onActive = (e) =>{
+        this.setState({filter:'active'});
+        this.changeButtonView(e);
+    }
+    onDone = (e) =>{
+        this.setState({filter:'done'});
+        this.changeButtonView(e);
+    }
+    onAll = (e)=>{
+        this.setState({filter:'all'});
+        this.changeButtonView(e);
+    }
+
+    onFilterItems = (items)=>{
+
+        switch (this.state.filter){
+            case 'all': return items;
+            case 'active': return items.filter((el)=>!el.done);
+            case 'done': return items.filter((el)=>el.done);
+
+        }
+    }
+
     render(){
         const {todoData, term} = this.state;
 
-        const visibleItems = this.search(todoData, term);
+        const visibleItems = this.onFilterItems(this.search(todoData, term));
         const doneCount = todoData.filter((el)=>el.done === true).length;
         const todoCount = todoData.length - doneCount;
         return(
@@ -108,7 +143,11 @@ export default class App extends Component {
                     <SearchPanel
                         onSearchChange = {this.onSearchChange}
                     />
-                    <ItemStatusFilter />
+                    <ItemStatusFilter
+                        onActive = {this.onActive}
+                        onDone = {this.onDone}
+                        onAll = {this.onAll}
+                    />
                 </div>
                 <TodoList todos={visibleItems}
                           onDeleted ={this.deleteItem}
